@@ -9,7 +9,8 @@ st.set_page_config(page_title="Smishing Detector", page_icon="🛡️", layout="
 # 1. TITLE AND DESCRIPTION
 st.title("🛡️ AI Smishing Detector")
 st.markdown("""
-This AI is trained on the **SMS Spam Collection** dataset. 
+This AI Model is developed by **Osama Saeed** and is trained on the **SMS Spam Collection** dataset.
+For feedback and suggestion, please Email: osamas.bizz@gmail.com
 Enter a text message below to check if it's **Safe (Ham)** or **Malicious (Spam/Smishing)**.
 """)
 
