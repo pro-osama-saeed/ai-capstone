@@ -17,17 +17,30 @@ For feedback and suggestion, please Email: osamas.bizz@gmail.com""")
 # 2. LOAD DATA & TRAIN MODEL
 # We use @st.cache_data so it only trains once when the app starts, not every time you click a button.
 @st.cache_data
+@st.cache_data
 def load_and_train_model():
-    # Load data
+    # 1. Load the Original Data
     url = "https://raw.githubusercontent.com/justmarkham/pycon-2016-tutorial/master/data/sms.tsv"
     col_names = ['label', 'message']
     data = pd.read_csv(url, sep='\t', header=None, names=col_names)
 
-    # Prepare data
+    # 2. INJECT NEW DATA (Teach it new tricks!)
+    # Add messages here that the AI got wrong. 
+    # Label them correctly as 'ham' (safe) or 'spam' (malicious).
+    new_data = pd.DataFrame([
+        {'label': 'ham', 'message': 'Hey, are you free tomorrow? I won tickets to the game!'},
+        {'label': 'spam', 'message': 'Hello friend, I have a business proposal for you. Please email me.'},
+        {'label': 'ham', 'message': 'Your package is waiting at the front desk.'},
+        {'label': 'ham', 'message': 'Hi, please update your banking details using the following link, otherwise it will be blocked as soon as possible. its URGENT'}
+    ])
+
+    # Combine the original data with your new examples
+    data = pd.concat([data, new_data], ignore_index=True)
+
+    # 3. Train the Model
     X = data['message']
     y = data['label']
-
-    # Train Model
+    
     vect = CountVectorizer()
     X_dtm = vect.fit_transform(X)
     nb = MultinomialNB()
