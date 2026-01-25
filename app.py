@@ -32,6 +32,7 @@ def load_and_train_model():
         {'label': 'spam', 'message': 'Hello friend, I have a business proposal for you. Please email me.'},
         {'label': 'ham', 'message': 'Your package is waiting at the front desk.'},
         {'label': 'spam', 'message': 'Hi, please update your banking details using the following link, otherwise it will be blocked as soon as possible. its URGENT'}
+        {'label': 'spam', 'message': 'Hey buddy, share OTP, so I can transfer money. ITS URGENT'}
     ])
 
     # Combine the original data with your new examples
