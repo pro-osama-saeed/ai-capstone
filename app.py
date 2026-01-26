@@ -66,8 +66,10 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("**Developer:** Osama Saeed")
+    st.markdown("**Project:** AI Capstone")
+    st.markdown("**Github:**@pro-osama-saeed")
     st.markdown("📧 [osamas.bizz@gmail.com](mailto:osamas.bizz@gmail.com)")
-    st.caption("v1.2 | Updated 2024")
+    st.caption("v2.0 | Updated 26 Jan, 2026")
 
 # --- 5. MAIN INTERFACE ---
 st.title("🛡️ AI Smishing Detector")
