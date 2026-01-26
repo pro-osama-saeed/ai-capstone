@@ -3,42 +3,46 @@ import pandas as pd
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.naive_bayes import MultinomialNB
 
-# --- PAGE CONFIGURATION ---
-st.set_page_config(page_title="Smishing Detector", page_icon="🛡️", layout="centered")
+# --- 1. PAGE CONFIGURATION ---
+st.set_page_config(
+    page_title="SmishGuard | AI Detector",
+    page_icon="🛡️",
+    layout="wide", # Changed to wide for better use of space
+    initial_sidebar_state="expanded"
+)
 
-# 1. TITLE AND DESCRIPTION
-st.title("🛡️ AI Smishing Detector")
+# --- 2. CUSTOM CSS FOR BETTER UI ---
 st.markdown("""
-This AI Model is developed by **Osama Saeed** and is trained on the **SMS Spam Collection** dataset.
-For feedback and suggestion, please Email: osamas.bizz@gmail.com""")
-("""Enter a text message below to check if it's **Safe (Ham)** or **Malicious (Spam/Smishing)**.
-""")
+<style>
+    .reportview-container {
+        background: #f0f2f6
+    }
+    .big-font {
+        font-size:20px !important;
+        font-weight: bold;
+    }
+</style>
+""", unsafe_allow_html=True)
 
-# 2. LOAD DATA & TRAIN MODEL
-# We use @st.cache_data so it only trains once when the app starts, not every time you click a button.
-@st.cache_data
+# --- 3. MODEL LOADING & TRAINING ---
 @st.cache_data
 def load_and_train_model():
-    # 1. Load the Original Data
+    # Load Original Data
     url = "https://raw.githubusercontent.com/justmarkham/pycon-2016-tutorial/master/data/sms.tsv"
     col_names = ['label', 'message']
     data = pd.read_csv(url, sep='\t', header=None, names=col_names)
 
-    # 2. INJECT NEW DATA (Teach it new tricks!)
-    # Add messages here that the AI got wrong. 
-    # Label them correctly as 'ham' (safe) or 'spam' (malicious).
+    # Inject New Data (Edge Cases)
     new_data = pd.DataFrame([
         {'label': 'ham', 'message': 'Hey, are you free tomorrow? I won tickets to the game!'},
         {'label': 'spam', 'message': 'Hello friend, I have a business proposal for you. Please email me.'},
         {'label': 'ham', 'message': 'Your package is waiting at the front desk.'},
-        {'label': 'spam', 'message': 'Hi, please update your banking details using the following link, otherwise it will be blocked as soon as possible. its URGENT'},
+        {'label': 'spam', 'message': 'Hi, please update your banking details using the following link. URGENT'},
         {'label': 'spam', 'message': 'Hey buddy, share OTP, so I can transfer money. ITS URGENT'}
     ])
-
-    # Combine the original data with your new examples
     data = pd.concat([data, new_data], ignore_index=True)
 
-    # 3. Train the Model
+    # Train Model
     X = data['message']
     y = data['label']
     
@@ -49,27 +53,77 @@ def load_and_train_model():
     
     return vect, nb
 
-# Load the model (this will show a spinner the first time)
-with st.spinner("Training the AI model..."):
+# Initialize Model
+with st.spinner("Initializing AI Defense Systems..."):
     vect, model = load_and_train_model()
 
-# 3. USER INTERFACE
-user_message = st.text_area("Paste the SMS message here:", height=100)
+# --- 4. SIDEBAR INFO ---
+with st.sidebar:
+    st.image("https://cdn-icons-png.flaticon.com/512/2092/2092663.png", width=100)
+    st.title("SmishGuard 🛡️")
+    st.markdown("### How it works")
+    st.info("This tool uses a **Naive Bayes** machine learning model trained on thousands of SMS logs to detect patterns common in phishing attacks.")
+    
+    st.markdown("---")
+    st.markdown("**Developer:** Osama Saeed")
+    st.markdown("📧 [osamas.bizz@gmail.com](mailto:osamas.bizz@gmail.com)")
+    st.caption("v1.2 | Updated 2024")
 
-if st.button("Analyze Message"):
-    if user_message:
-        # Transform the user's text into numbers
+# --- 5. MAIN INTERFACE ---
+st.title("🛡️ AI Smishing Detector")
+st.markdown("##### Analyze suspicious text messages instantly.")
+st.divider()
+
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    st.subheader("📝 Input Message")
+    # Using a form so the page doesn't reload on every keystroke
+    with st.form("analysis_form"):
+        user_message = st.text_area("Paste the SMS text here:", height=150, placeholder="e.g. You have won a lottery! Click here to claim...")
+        submit_button = st.form_submit_button("🔍 Analyze Message", type="primary")
+
+with col2:
+    st.subheader("📊 Analysis Results")
+    if submit_button and user_message:
+        # Transform and Predict
         input_dtm = vect.transform([user_message])
-        # Predict
         prediction = model.predict(input_dtm)[0]
-
-        st.divider() # Adds a visual line
+        
+        # Get Probability (Confidence Score)
+        # returns [[prob_ham, prob_spam]]
+        proba = model.predict_proba(input_dtm)[0] 
+        spam_score = proba[1]
         
         if prediction == 'spam':
-            st.error(f"🚨 **ALERT: SPAM DETECTED**")
-            st.write("The AI is 98% sure this is a malicious message.")
+            st.error("🚨 **POTENTIAL THREAT DETECTED**")
+            st.metric(label="Spam Confidence", value=f"{spam_score*100:.1f}%", delta="High Risk", delta_color="inverse")
+            st.progress(spam_score, text="Threat Level")
+            st.write("This message contains patterns highly typical of malicious phishing.")
         else:
-            st.success(f"✅ **SAFE MESSAGE**")
-            st.write("The AI thinks this message is normal.")
+            st.success("✅ **SAFE MESSAGE**")
+            st.metric(label="Safety Score", value=f"{(1-spam_score)*100:.1f}%", delta="Safe")
+            st.progress(spam_score, text="Threat Level")
+            st.write("This message appears to be a standard communication.")
+            
+    elif submit_button and not user_message:
+        st.warning("Please enter some text to analyze.")
     else:
-        st.warning("Please type a message first!")
+        st.info("Awaiting input...")
+
+# --- 6. HISTORY LOG (Optional UX Feature) ---
+if "history" not in st.session_state:
+    st.session_state.history = []
+
+if submit_button and user_message:
+    st.session_state.history.insert(0, {"msg": user_message[:50] + "...", "type": prediction})
+
+if st.session_state.history:
+    st.divider()
+    st.caption("🕒 Recent Session Checks")
+    for item in st.session_state.history[:3]: # Show last 3
+        if item['type'] == 'spam':
+            st.markdown(f"🔴 **Spam:** {item['msg']}")
+        else:
+            st.markdown(f"🟢 **Safe:** {item['msg']}")
+
