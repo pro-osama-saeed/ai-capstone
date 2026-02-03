@@ -65,11 +65,14 @@ with st.sidebar:
     st.info("This tool uses a **Naive Bayes** machine learning model trained on thousands of SMS logs to detect patterns common in phishing attacks.")
     
     st.markdown("---")
-    st.markdown("**Developer:** Osama Saeed")
+    st.markdown("**Developer Group:**")
+    st.markdown("* - Osama Saeed*")
+    st.markdown("* - Areeba Waheed*")
+    st.markdown("* - Mohsin Bin Aftab*")
     st.markdown("**Project:** AI Capstone")
     st.markdown("**Github:**@pro-osama-saeed")
     st.markdown("Feedback & Suggestion: 📧 [osamas.bizz@gmail.com](mailto:osamas.bizz@gmail.com)")
-    st.caption("v2.0 | Updated 26 Jan, 2026")
+    st.caption("v2.1 | Updated 3rd Feb, 2026")
 
 # --- 5. MAIN INTERFACE ---
 st.title("🛡️ AI Smishing Detector")
