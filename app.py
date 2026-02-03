@@ -66,9 +66,9 @@ with st.sidebar:
     
     st.markdown("---")
     st.markdown("**Developer Group:**")
-    st.markdown("* - Osama Saeed*")
-    st.markdown("* - Areeba Waheed*")
-    st.markdown("* - Mohsin Bin Aftab*")
+    st.markdown("*Osama Saeed*")
+    st.markdown("*Areeba Waheed*")
+    st.markdown("*Mohsin Bin Aftab*")
     st.markdown("**Project:** AI Capstone")
     st.markdown("**Github:**@pro-osama-saeed")
     st.markdown("Feedback & Suggestion: 📧 [osamas.bizz@gmail.com](mailto:osamas.bizz@gmail.com)")
